@@ -24,7 +24,7 @@ Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):en
 
 % Setup some useful variables
 m = size(X, 1);
-         
+
 % You need to return the following variables correctly 
 J = 0;
 Theta1_grad = zeros(size(Theta1));
@@ -61,11 +61,44 @@ Theta2_grad = zeros(size(Theta2));
 %               the regularization separately and then add them to Theta1_grad
 %               and Theta2_grad from Part 2.
 %
+%计算h
+a1 = [ones(m,1),X];
+z2 = a1 * Theta1';
+a2 = sigmoid(z2);
+a2 = [ones(size(a2),1),a2];
+z3 = a2 * Theta2';
+a3 = sigmoid(z3);
+h = a3;
+%将y展开，如y=1;变为 y = [1 0 0 0 0 0 0 0 0 0 ]
+y_new = zeros(m,num_labels);
+for i =1:m
+	index = y(i);
+	y_new(i,index) = 1;
+end
 
+%计算costfunction
+J = -sum(sum(y_new .* (log(h))+(1-y_new).*(log(1-h))))/m;
 
+%正则化
+Theta1_reItem = power(Theta1( : , 2 : end), 2 );
+Theta2_reItem = power(Theta2( : , 2 : end), 2 );
+J = J + ( sum(sum(Theta1_reItem)) + sum(sum(Theta2_reItem)) ) * lambda / (2 * m);
 
+%计算Gradcent
 
+for t = 1 : m
+	delta_3 = a3(t,:)' - y_new(t, : )';
+	delta_2 = Theta2' * delta_3;
+	delta_2 = delta_2(2:end) .* sigmoidGradient(z2(t, : ))';
+	Theta2_grad = Theta2_grad + delta_3 * a2(t, : );
+	Theta1_grad = Theta1_grad + delta_2 * a1(t, : );
+end
 
+Theta1_grad = Theta1_grad / m ;
+Theta2_grad = Theta2_grad / m ;
+
+Theta1_grad(:,2 : end) = Theta1_grad(:,2 : end) + lambda/m * Theta1(:,2:end);
+Theta2_grad(:,2 : end) = Theta2_grad(:,2 : end) + lambda/m * Theta2(:,2:end);
 
 
 
