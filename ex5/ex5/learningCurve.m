@@ -52,6 +52,23 @@ error_val   = zeros(m, 1);
 %
 
 % ---------------------- Sample Solution ----------------------
+for i = 1:m
+	% 取前i个样本
+	X_use = X(1:i,:);
+	y_use = y(1:i);
+	
+	% 随机取i个样本
+%	s = sampling(1:m,i);
+%	X_use = X(s,:);
+%	y_use = y(s);
+	
+	theta = trainLinearReg(X_use, y_use, lambda);
+	error_train(i) = linearRegCostFunction(X_use, y_use, theta, 0);
+	error_val(i) = linearRegCostFunction(Xval, yval, theta, 0);
+	
+end
+
+
 
 
 
